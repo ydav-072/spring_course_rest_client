@@ -17,22 +17,33 @@ public class Communication {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Employee> getAllEmployees(){
+    public List<Employee> getAllEmployees() {
         ResponseEntity<List<Employee>> responseEntity = restTemplate.exchange(URL, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<Employee>>() {});
+                new ParameterizedTypeReference<List<Employee>>() {
+                });
         List<Employee> employeeList = responseEntity.getBody();
-        return  employeeList;
+        return employeeList;
     }
 
-    public Employee getEmployee(int id){
-        return null;
+    public Employee getEmployee(int id) {
+        Employee employee = restTemplate.getForObject(URL + "/" + id, Employee.class);
+        return employee;
     }
 
-    public void saveEmployee(Employee employee){
-
+    public void saveEmployee(Employee employee) {
+        int id = employee.getId();
+        if (id == 0){
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(URL, employee, String.class);
+            System.out.println("New employee was added to Db");
+            System.out.println(responseEntity.getBody());
+        }else {
+            restTemplate.put(URL, employee);
+            System.out.println("Employee with id " + id + " was updated");
+        }
     }
 
-    public void deleteEmployee(int id){
-
+    public void deleteEmployee(int id) {
+        restTemplate.delete(URL + "/" + id);
+        System.out.println("Employee with id " + id + " was deleted");
     }
 }
